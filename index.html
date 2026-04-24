@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Chronos</title>
+
+    <!-- PWA / installability -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#E05555" />
+
+    <!-- Apple PWA meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Chronos" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <!-- Prevent double-tap zoom on iOS -->
+    <style>
+      * { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+      html, body, #root { height: 100%; margin: 0; padding: 0; }
+      body { overscroll-behavior: none; background: #0D0E18; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
