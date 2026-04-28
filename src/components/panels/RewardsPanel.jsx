@@ -24,7 +24,10 @@ function streakMultiplier(streak) {
 
 const TABS = ["Overview","Badges","Challenges","Activity","Shop"];
 
-export default function RewardsPanel({ rewards, T, currentUser, accent, activityFeed = [], onSpend }) {
+export default function RewardsPanel({ rewards, T, currentUser, accent, activityFeed = [], onSpend, calBg = "transparent", isBgDark = true }) {
+  const hasBg = calBg !== "transparent";
+  const onBg0 = hasBg ? (isBgDark ? "#fff" : "#1a1a2e") : T.t0;
+  const onBg2 = hasBg ? (isBgDark ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,0.45)") : T.t2;
   const [tab, setTab]           = useState("Overview");
   const [confetti, setConfetti] = useState(0);
   const [purchased, setPurchased] = useState(new Set());

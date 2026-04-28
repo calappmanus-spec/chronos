@@ -37,17 +37,41 @@ export function expandEvents(evs, rangeStart, rangeEnd) {
         if (d >= s && d <= e) out.push(ev);
         return;
       }
-      const until = ev.recurrence.until ? new Date(ev.recurrence.until) : addYears(e, 1);
-      const cap = until < e ? until : e;
-      let cur = new Date(ev.date), n = 0;
-      while (cur <= cap && n < 400) {
-        if (cur >= s) out.push({ ...ev, date: fmtDate(cur), id: `${ev.baseId || ev.id}_${fmtDate(cur)}` });
-        const f = ev.recurrence.freq;
-        cur = f === "daily"   ? addDays(cur, 1)
-            : f === "weekly"  ? addDays(cur, 7)
-            : f === "monthly" ? addMonths(cur, 1)
-            : addYears(cur, 1);
-        n++;
+      const freq     = ev.recurrence.freq;
+      const interval = Math.max(1, ev.recurrence.interval || 1);
+      const days     = ev.recurrence.days || [];
+      const until    = ev.recurrence.until ? new Date(ev.recurrence.until) : addYears(e, 1);
+      const cap      = until < e ? until : e;
+      const evStart  = new Date(ev.date); evStart.setHours(0, 0, 0, 0);
+
+      if (freq === "weekly" && days.length > 0) {
+        // Weekly on specific weekdays (0=Sun…6=Sat), repeating every `interval` weeks
+        // Find the Sunday at or before evStart
+        let weekBase = new Date(evStart);
+        weekBase = addDays(weekBase, -weekBase.getDay());
+        let n = 0;
+        while (weekBase <= cap && n < 1000) {
+          for (const dow of [...days].sort((a, b) => a - b)) {
+            const candidate = addDays(weekBase, dow);
+            if (candidate < evStart) continue;
+            if (candidate > cap) break;
+            if (candidate >= s) {
+              out.push({ ...ev, date: fmtDate(candidate), id: `${ev.baseId || ev.id}_${fmtDate(candidate)}` });
+            }
+          }
+          weekBase = addDays(weekBase, 7 * interval);
+          n++;
+        }
+      } else {
+        let cur = new Date(evStart), n = 0;
+        while (cur <= cap && n < 400) {
+          if (cur >= s) out.push({ ...ev, date: fmtDate(cur), id: `${ev.baseId || ev.id}_${fmtDate(cur)}` });
+          cur = freq === "daily"   ? addDays(cur, interval)
+              : freq === "weekly"  ? addDays(cur, 7 * interval)
+              : freq === "monthly" ? addMonths(cur, interval)
+              : addYears(cur, interval);
+          n++;
+        }
       }
     } catch { /* skip bad events */ }
   });

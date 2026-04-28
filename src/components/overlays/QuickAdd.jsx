@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
+import { Lock } from "lucide-react";
 import { uid } from "../../utils.js";
 import { parseEventFromText } from "../../ai.js";
 import { FF } from "../../theme.js";
 
-export default function QuickAdd({ date, currentUser, onSave, onClose, T, accent }) {
+export default function QuickAdd({ date, currentUser, onSave, onClose, onMoreOptions, T, accent }) {
   const [mode,      setMode]      = useState("quick");
   const [title,     setTitle]     = useState("");
   const [start,     setStart]     = useState("09:00");
@@ -15,11 +16,13 @@ export default function QuickAdd({ date, currentUser, onSave, onClose, T, accent
 
   useEffect(() => { setTimeout(() => titleRef.current?.focus(), 60); }, []);
 
+  const [isPrivate, setIsPrivate] = useState(false);
+
   function handleQuickSave() {
     if (!title.trim()) return;
     const id = uid(), baseId = uid();
     const att = { [currentUser]: "accepted" };
-    onSave({ id, baseId, title: title.trim(), date, start, end, pids: [currentUser], organizer: currentUser, allDay: false, recurring: false, recurrence: { freq: "weekly", until: "" }, reminders: [15], important: false, attendees: att });
+    onSave({ id, baseId, title: title.trim(), date, start, end, pids: [currentUser], organizer: currentUser, allDay: false, recurring: false, recurrence: { freq: "weekly", until: "" }, reminders: [15], important: false, private: isPrivate, attendees: att });
   }
 
   async function handleAISave() {
@@ -56,10 +59,23 @@ export default function QuickAdd({ date, currentUser, onSave, onClose, T, accent
                 <input type="time" value={end} onChange={e => setEnd(e.target.value)} style={inp} />
               </div>
             </div>
-            <div style={{ display: "flex", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", marginBottom: 12 }}>
+              <button onClick={() => setIsPrivate(v => !v)} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 600, padding: "4px 11px", borderRadius: 20, border: `1px solid ${isPrivate ? "#6366F1" : T.b1}`, background: isPrivate ? "rgba(99,102,241,0.1)" : "transparent", color: isPrivate ? "#6366F1" : T.t2, cursor: "pointer", ...FF }}>
+                <Lock size={10} strokeWidth={2.5} /> {isPrivate ? "Private" : "Public"}
+              </button>
+            </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
               <button onClick={onClose} style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: `1px solid ${T.b1}`, background: "transparent", color: T.t2, fontSize: 13, fontWeight: 600, cursor: "pointer", ...FF }}>Cancel</button>
               <button onClick={handleQuickSave} disabled={!title.trim()} style={{ flex: 2, padding: "10px 0", borderRadius: 10, border: "none", background: title.trim() ? accent : "rgba(128,128,128,0.2)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", ...FF }}>Add Event</button>
             </div>
+            {onMoreOptions && (
+              <button
+                onClick={() => onMoreOptions({ title: title.trim(), date, start, end, private: isPrivate })}
+                style={{ width: "100%", padding: "8px 0", borderRadius: 10, border: `1px solid ${T.b1}`, background: "transparent", color: T.t2, fontSize: 12, fontWeight: 600, cursor: "pointer", ...FF }}
+              >
+                More options →
+              </button>
+            )}
           </>
         )}
         {mode === "ai" && (

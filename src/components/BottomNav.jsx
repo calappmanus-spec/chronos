@@ -1,21 +1,25 @@
-import { CalendarDays, UtensilsCrossed, CloudSun, Plus, CheckSquare, Trophy, Settings } from "lucide-react";
+import { CalendarDays, UtensilsCrossed, CloudSun, Plus, CheckSquare, Target, Settings } from "lucide-react";
 import { NAV_H } from "../constants.js";
 import { rgba } from "../utils.js";
 import { FF } from "../theme.js";
 
 const ITEMS = [
   { id: "calendars", label: "Calendar", Icon: CalendarDays },
-  { id: "meals",     label: "Meals",    Icon: UtensilsCrossed },
+  { id: "meals",     label: "Fitness",  Icon: UtensilsCrossed },
   { id: "weather",   label: "Weather",  Icon: CloudSun },
   null,
   { id: "tasks",     label: "Tasks",    Icon: CheckSquare },
-  { id: "rewards",   label: "Rewards",  Icon: Trophy },
+  { id: "goals",     label: "Goals",    Icon: Target },
   { id: "settings",  label: "Settings", Icon: Settings },
 ];
 
-export default function BottomNav({ section, setSection, showCalPanel, setShowCalPanel, onNew, accent, T }) {
+export default function BottomNav({ section, setSection, showCalPanel, setShowCalPanel, onNew, accent, T, calBg = "transparent", darkMode = false, isBgDark = true }) {
+  const hasBg     = calBg !== "transparent";
+  const navBorder = hasBg ? (isBgDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)") : T.b1;
+  const inactiveColor = hasBg ? (isBgDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.4)") : T.t2;
+  const activeColor   = hasBg ? (isBgDark ? "#fff" : "#1a1a2e") : accent;
   return (
-    <div style={{ height: NAV_H, background: T.bg1, borderTop: `1px solid ${T.b1}`, display: "flex", alignItems: "center", justifyContent: "space-around", padding: "0 4px", paddingBottom: "env(safe-area-inset-bottom)", flexShrink: 0 }}>
+    <div style={{ height: NAV_H, background: hasBg ? "transparent" : T.bg1, borderTop: `1px solid ${navBorder}`, display: "flex", alignItems: "center", justifyContent: "space-around", padding: "0 4px", paddingBottom: "env(safe-area-inset-bottom)", flexShrink: 0 }}>
       {ITEMS.map((item, i) => {
         if (item === null) {
           return (
@@ -40,7 +44,7 @@ export default function BottomNav({ section, setSection, showCalPanel, setShowCa
                 setShowCalPanel(false);
               }
             }}
-            style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: active ? rgba(accent, 0.1) : "none", border: active ? `1px solid ${rgba(accent, 0.2)}` : "1px solid transparent", cursor: "pointer", color: active ? accent : T.t2, padding: "5px 8px", borderRadius: 10, transition: "all 0.15s", ...FF }}
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: active ? rgba(accent, hasBg ? 0.2 : 0.1) : "none", border: active ? `1px solid ${rgba(accent, hasBg ? 0.35 : 0.2)}` : "1px solid transparent", cursor: "pointer", color: active ? activeColor : inactiveColor, padding: "5px 8px", borderRadius: 10, transition: "all 0.15s", ...FF }}
           >
             <item.Icon size={18} strokeWidth={active ? 2.5 : 1.8} />
             <span style={{ fontSize: 9, fontWeight: active ? 700 : 500, ...FF }}>{item.label}</span>

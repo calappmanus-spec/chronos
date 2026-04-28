@@ -3,23 +3,91 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Chronos</title>
+
+    <!-- Primary meta -->
+    <title>Chronos — Your Intelligent Calendar</title>
+    <meta name="description" content="Chronos is a full-featured personal calendar PWA with AI scheduling, goals tracking, fitness planning, meals, weather wellness, and focus modes." />
+    <meta name="keywords" content="calendar, planner, goals, ai scheduler, pwa, wellness, fitness, meal planning" />
+    <meta name="author" content="Chronos" />
+    <meta name="robots" content="index, follow" />
 
     <!-- PWA / installability -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#E05555" />
+    <meta name="color-scheme" content="dark light" />
 
     <!-- Apple PWA meta tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Chronos" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
 
-    <!-- Prevent double-tap zoom on iOS -->
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Chronos — Your Intelligent Calendar" />
+    <meta property="og:description" content="A full-featured personal calendar with AI scheduling, goals, wellness, and more. Works offline as a PWA." />
+    <meta property="og:image" content="/icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Chronos — Your Intelligent Calendar" />
+    <meta name="twitter:description" content="AI-powered calendar with goals, fitness, meals, and wellness. Install as a PWA." />
+    <meta name="twitter:image" content="/icon-512.png" />
+
+    <!-- Performance hints -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://api.open-meteo.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Prevent double-tap zoom & baseline styles -->
     <style>
-      * { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-      html, body, #root { height: 100%; margin: 0; padding: 0; }
-      body { overscroll-behavior: none; background: #0D0E18; }
+      *, *::before, *::after {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        box-sizing: border-box;
+      }
+      html, body, #root {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        overscroll-behavior: none;
+        background: #0D0E18;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      /* Animate pop-in */
+      @keyframes pop-in {
+        from { opacity: 0; transform: scale(0.92) translateY(6px); }
+        to   { opacity: 1; transform: scale(1)    translateY(0); }
+      }
+      .animate-pop { animation: pop-in 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+      /* Slide up */
+      @keyframes slide-up {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .animate-up { animation: slide-up 0.22s ease both; }
+
+      /* Scrollbar styling */
+      ::-webkit-scrollbar { width: 4px; height: 4px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+      /* Focus outline for accessibility */
+      :focus-visible { outline: 2px solid #6366F1; outline-offset: 2px; border-radius: 4px; }
     </style>
   </head>
   <body>

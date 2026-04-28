@@ -38,6 +38,14 @@ function ToastItem({ toast, onRemove }) {
         {toast.title && <div style={{ fontSize: 13, fontWeight: 700, color: c.text, marginBottom: 1 }}>{toast.title}</div>}
         <div style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", lineHeight: 1.4 }}>{toast.message}</div>
       </div>
+      {toast.action && (
+        <button
+          onClick={e => { e.stopPropagation(); toast.action.fn(); setLeaving(true); setTimeout(() => onRemove(toast.id), 280); }}
+          style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: "transparent", color: c.text, cursor: "pointer", ...FF }}
+        >
+          {toast.action.label}
+        </button>
+      )}
     </div>
   );
 }

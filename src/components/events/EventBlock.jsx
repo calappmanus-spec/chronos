@@ -2,12 +2,26 @@ import { makeEventColors } from "../../data.js";
 import { rgba } from "../../utils.js";
 import MultiBar from "./MultiBar.jsx";
 
-export default function EventBlock({ ev, top, height, onClick, onMouseDown, faded }) {
-  const c = makeEventColors(ev.pids || []);
-  const multi = (ev.pids || []).length > 1;
+export default function EventBlock({ ev, top, height, onClick, onMouseDown, onLongPress, faded }) {
+  const base = makeEventColors(ev.pids || []);
+  const c = ev.color
+    ? { bg: ev.color + "22", bar: ev.color, txt: ev.color }
+    : ev.calColor
+    ? { bg: ev.calColor + "22", bar: ev.calColor, txt: ev.calColor }
+    : base;
+  const multi = !ev.color && !ev.calColor && (ev.pids || []).length > 1;
+
+  let lpTimer = null;
+  function handleTouchStart(e) {
+    lpTimer = setTimeout(() => { e.preventDefault(); onLongPress && onLongPress(ev); }, 500);
+  }
+  function handleTouchEnd() { clearTimeout(lpTimer); }
   return (
     <div
       onMouseDown={e => { e.stopPropagation(); onMouseDown && onMouseDown(e, ev); }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchMove={handleTouchEnd}
       onClick={e => { e.stopPropagation(); !faded && onClick(ev); }}
       style={{
         position: "absolute", top, height: Math.max(height, 22),

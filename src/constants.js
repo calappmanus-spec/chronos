@@ -18,7 +18,7 @@ export const HOURS    = Array.from({ length: 24 }, (_, i) => i);
 export const HH     = 54;  // px per hour in time views
 export const NAV_H  = 64;  // bottom nav height
 
-export const SECTIONS = ["calendar","meals","weather","tasks","rewards","settings"];
+export const SECTIONS = ["calendar","meals","weather","tasks","goals","rewards","settings"];
 
 export const LEVELS = [
   { min: 0,    name: "Starter",  color: "#9898B8" },
@@ -80,25 +80,24 @@ export const CAL_COLORS = [
 
 function calUid() { return Math.random().toString(36).slice(2,8); }
 export const INIT_CALENDARS = [
-  { id: "cal_personal", name: "Personal",  color: "#6366F1", members: ["jeremy"],                         owner: "jeremy", isDefault: true,  shared: false },
-  { id: "cal_family",   name: "Family",    color: "#E05555", members: ["jeremy","sarah","emma"],           owner: "jeremy", isDefault: true,  shared: true  },
-  { id: "cal_work",     name: "Work",      color: "#0096C7", members: ["jeremy","alex","morgan","casey"], owner: "jeremy", isDefault: true,  shared: true  },
+  { id: "cal_personal", name: "Personal", color: "#6366F1", members: ["jeremy"],              owner: "jeremy", isDefault: true, shared: false },
+  { id: "cal_family",   name: "Family",   color: "#E05555", members: ["jeremy","sarah","emma"], owner: "jeremy", isDefault: true, shared: true  },
 ];
 
 // ─── Calendar background presets ─────────────────────────────────────────
 export const CAL_BACKGROUNDS = [
-  { id:"default",   label:"Default",       value:"transparent" },
-  { id:"cosmos",    label:"Cosmos",        value:"radial-gradient(ellipse at top, #1a1a3e 0%, #0d0e18 70%)" },
-  { id:"aurora",    label:"Aurora",        value:"linear-gradient(135deg, #0d1b2a 0%, #1b2838 40%, #0f3d2e 100%)" },
-  { id:"sunset",    label:"Sunset",        value:"linear-gradient(160deg, #2d1b3d 0%, #1a0a2e 40%, #3d1a1a 100%)" },
-  { id:"ocean",     label:"Ocean",         value:"linear-gradient(180deg, #0a1628 0%, #0d2340 50%, #0a1628 100%)" },
-  { id:"forest",    label:"Forest",        value:"linear-gradient(135deg, #0d1f0f 0%, #132b15 60%, #0d1f0f 100%)" },
-  { id:"rose",      label:"Rose Quartz",   value:"linear-gradient(135deg, #2a1520 0%, #3d1f2e 60%, #1a0d18 100%)" },
-  { id:"arctic",    label:"Arctic",        value:"linear-gradient(180deg, #0e1f2e 0%, #152436 50%, #0a1520 100%)" },
-  { id:"ember",     label:"Ember",         value:"linear-gradient(160deg, #1f0d00 0%, #2e1500 50%, #1a0800 100%)" },
-  { id:"lavender",  label:"Lavender",      value:"linear-gradient(135deg, #1a1030 0%, #251545 60%, #150e28 100%)" },
-  { id:"light",     label:"Snow",          value:"linear-gradient(160deg, #f0f2f8 0%, #e8ecf5 100%)" },
-  { id:"mint",      label:"Mint",          value:"linear-gradient(160deg, #e8f5f0 0%, #d4ede6 100%)" },
+  { id:"default",   label:"Default",       value:"transparent",                                                         dark: true  },
+  { id:"cosmos",    label:"Cosmos",        value:"radial-gradient(ellipse at top, #1a1a3e 0%, #0d0e18 70%)",            dark: true  },
+  { id:"aurora",    label:"Aurora",        value:"linear-gradient(135deg, #0d1b2a 0%, #1b2838 40%, #0f3d2e 100%)",      dark: true  },
+  { id:"sunset",    label:"Sunset",        value:"linear-gradient(160deg, #2d1b3d 0%, #1a0a2e 40%, #3d1a1a 100%)",      dark: true  },
+  { id:"ocean",     label:"Ocean",         value:"linear-gradient(180deg, #0a1628 0%, #0d2340 50%, #0a1628 100%)",      dark: true  },
+  { id:"forest",    label:"Forest",        value:"linear-gradient(135deg, #0d1f0f 0%, #132b15 60%, #0d1f0f 100%)",      dark: true  },
+  { id:"rose",      label:"Rose Quartz",   value:"linear-gradient(135deg, #2a1520 0%, #3d1f2e 60%, #1a0d18 100%)",      dark: true  },
+  { id:"arctic",    label:"Arctic",        value:"linear-gradient(180deg, #0e1f2e 0%, #152436 50%, #0a1520 100%)",      dark: true  },
+  { id:"ember",     label:"Ember",         value:"linear-gradient(160deg, #1f0d00 0%, #2e1500 50%, #1a0800 100%)",      dark: true  },
+  { id:"lavender",  label:"Lavender",      value:"linear-gradient(135deg, #1a1030 0%, #251545 60%, #150e28 100%)",      dark: true  },
+  { id:"light",     label:"Snow",          value:"linear-gradient(160deg, #f0f2f8 0%, #e8ecf5 100%)",                   dark: false },
+  { id:"mint",      label:"Mint",          value:"linear-gradient(160deg, #e8f5f0 0%, #d4ede6 100%)",                   dark: false },
 ];
 
 // ─── Weekly challenges (seeded from ISO week number) ─────────────────────

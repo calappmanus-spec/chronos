@@ -4,7 +4,7 @@ import { fmtDate, addDays, pad, weatherInfo, rgba, getProfile } from "../../util
 import { expandEvents } from "../../data.js";
 import { FF } from "../../theme.js";
 
-export default function SleepMode({ events, onExit }) {
+export default function SleepMode({ events, coords = { lat: 35.2271, lon: -80.8431 }, onExit }) {
   const [tick, setTick] = useState(new Date());
   const [wx,   setWx]   = useState(null);
   const [dim,  setDim]  = useState(false);
@@ -19,9 +19,10 @@ export default function SleepMode({ events, onExit }) {
   }, []);
 
   useEffect(() => {
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=35.2271&longitude=-80.8431&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=America%2FNew_York&temperature_unit=fahrenheit&forecast_days=2")
+    const { lat, lon } = coords;
+    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto&temperature_unit=fahrenheit&forecast_days=2`)
       .then(r => r.json()).then(setWx).catch(() => {});
-  }, []);
+  }, [coords]);
 
   const h = tick.getHours(), m = tick.getMinutes();
   const h12 = h % 12 || 12, ap = h >= 12 ? "PM" : "AM";

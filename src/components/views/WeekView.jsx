@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { DAYS_S, HOURS, HH } from "../../constants.js";
 import { TODAY, NOW_H, NOW_M, fmtDate, addDays, weekStart, toMin, minToTime, timeToY, rgba, getProfile } from "../../utils.js";
 import { expandEvents } from "../../data.js";
@@ -8,13 +8,20 @@ import DragGhost from "../events/DragGhost.jsx";
 
 const TW = 52; // time-column width px
 
-export default function WeekView({ date, events, onSlot, onEv, reschedule, T, calBg = "transparent" }) {
+export default function WeekView({ date, events, tasks = [], onSlot, onEv, reschedule, onLongPress, T, calBg = "transparent", isBgDark = true }) {
   const ws   = weekStart(date);
   const days = Array.from({ length: 7 }, (_, i) => addDays(ws, i));
-  const expanded = useMemo(() => expandEvents(events, ws, addDays(ws, 6)), [events, ws.toISOString()]);
+  const wsISO = ws.toISOString();
+  const expanded = useMemo(() => expandEvents(events, ws, addDays(ws, 6)), [events, wsISO]);
   const [drag, setDrag] = useState(null);
   const scrollRef = useRef(null);
   const nowY = (NOW_H + NOW_M / 60) * HH;
+
+  const tasksByDate = useMemo(() => {
+    const m = {};
+    (tasks || []).filter(t => t.due && !t.done).forEach(t => { if (!m[t.due]) m[t.due] = []; m[t.due].push(t); });
+    return m;
+  }, [tasks]);
 
   function startDrag(e, ev, colIdx) {
     if (!ev.start || !ev.end || ev.allDay) return;
@@ -53,27 +60,39 @@ export default function WeekView({ date, events, onSlot, onEv, reschedule, T, ca
     return () => { window.removeEventListener("mousemove", onMouseMove); window.removeEventListener("mouseup", onMouseUp); };
   }, [drag, days]);
 
+  const hasBg      = calBg !== "transparent";
+  const gridBorder = hasBg ? (isBgDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)") : T.b0;
+  const hdrBg      = hasBg ? (isBgDark ? "rgba(0,0,0,0.25)"      : "rgba(0,0,0,0.05)") : T.bg1;
+  const hdrBorder  = hasBg ? (isBgDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)")  : T.b1;
+  const hdrLabel   = hasBg ? (isBgDark ? "rgba(255,255,255,0.6)"  : "rgba(0,0,0,0.45)") : T.t2;
+  const hdrDate    = hasBg ? (isBgDark ? "rgba(255,255,255,0.9)"  : "rgba(0,0,0,0.75)") : T.t0;
+  const timeColor  = hasBg ? (isBgDark ? "rgba(255,255,255,0.4)"  : "rgba(0,0,0,0.35)") : T.t3;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden", position: "relative" }}>
-      {calBg !== "transparent" && <div className="cal-bg-overlay" style={{ background: calBg }} />}
       {/* Header row */}
-      <div style={{ display: "flex", background: T.bg1, borderBottom: `1px solid ${T.b1}`, flexShrink: 0 }}>
+      <div style={{ display: "flex", background: hdrBg, borderBottom: `1px solid ${hdrBorder}`, flexShrink: 0 }}>
         <div style={{ width: TW, flexShrink: 0 }} />
         {days.map(d => {
           const isToday = fmtDate(d) === TODAY;
           return (
-            <div key={d.toString()} style={{ flex: 1, textAlign: "center", padding: "8px 4px", borderLeft: `1px solid ${T.b0}` }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".6px", color: isToday ? T.red : T.t2, textTransform: "uppercase", ...FF }}>{DAYS_S[d.getDay()]}</div>
-              <div style={{ fontSize: 18, fontWeight: isToday ? 700 : 300, color: isToday ? T.red : T.t0, lineHeight: 1.2, ...FF }}>{d.getDate()}</div>
+            <div key={d.toString()} style={{ flex: 1, textAlign: "center", padding: "8px 4px", borderLeft: `1px solid ${gridBorder}` }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".6px", color: isToday ? T.red : hdrLabel, textTransform: "uppercase", ...FF }}>{DAYS_S[d.getDay()]}</div>
+              <div style={{ fontSize: 18, fontWeight: isToday ? 700 : 300, color: isToday ? T.red : hdrDate, lineHeight: 1.2, ...FF }}>{d.getDate()}</div>
+              {(tasksByDate[fmtDate(d)] || []).length > 0 && (
+                <div style={{ fontSize: 8, fontWeight: 700, color: "#F4881A", marginTop: 2, ...FF }}>
+                  ✓{(tasksByDate[fmtDate(d)] || []).length}
+                </div>
+              )}
             </div>
           );
         })}
       </div>
       {/* Scrollable time grid */}
       <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", display: "flex" }}>
-        <div style={{ width: TW, flexShrink: 0, borderRight: `1px solid ${T.b0}` }}>
+        <div style={{ width: TW, flexShrink: 0, borderRight: `1px solid ${gridBorder}` }}>
           {HOURS.map(h => (
-            <div key={h} style={{ height: HH, display: "flex", alignItems: "flex-start", justifyContent: "flex-end", paddingRight: 8, paddingTop: 3, fontSize: 10, color: T.t3, boxSizing: "border-box", ...FF }}>
+            <div key={h} style={{ height: HH, display: "flex", alignItems: "flex-start", justifyContent: "flex-end", paddingRight: 8, paddingTop: 3, fontSize: 10, color: timeColor, boxSizing: "border-box", ...FF }}>
               {h === 0 ? "" : h < 12 ? `${h}am` : h === 12 ? "12pm" : `${h - 12}pm`}
             </div>
           ))}
@@ -87,9 +106,9 @@ export default function WeekView({ date, events, onSlot, onEv, reschedule, T, ca
               <div
                 key={ds}
                 onClick={() => !drag && onSlot(ds)}
-                style={{ flex: 1, position: "relative", borderLeft: `1px solid ${T.b0}`, background: isToday ? rgba(T.red, 0.025) : T.bg }}
+                style={{ flex: 1, position: "relative", borderLeft: `1px solid ${gridBorder}`, background: isToday ? rgba(T.red, hasBg ? 0.12 : 0.025) : (hasBg ? "transparent" : T.bg) }}
               >
-                {HOURS.map(h => <div key={h} style={{ height: HH, borderBottom: `1px solid ${T.b0}`, boxSizing: "border-box" }} />)}
+                {HOURS.map(h => <div key={h} style={{ height: HH, borderBottom: `1px solid ${gridBorder}`, boxSizing: "border-box" }} />)}
                 {isToday && (
                   <div style={{ position: "absolute", left: 0, right: 0, top: nowY, height: 1.5, background: rgba(T.red, 0.6), zIndex: 5, pointerEvents: "none" }}>
                     <div style={{ position: "absolute", left: -4, top: -3, width: 8, height: 8, borderRadius: "50%", background: T.red }} />
@@ -98,7 +117,7 @@ export default function WeekView({ date, events, onSlot, onEv, reschedule, T, ca
                 {dayEvs.map(ev => {
                   const h = Math.max((toMin(ev.end) - toMin(ev.start)) / 60 * HH, 22);
                   const isFaded = drag && (drag.ev.baseId || drag.ev.id) === (ev.baseId || ev.id);
-                  return <EventBlock key={ev.id} ev={ev} top={timeToY(ev.start, HH)} height={h} onClick={onEv} onMouseDown={(e, ev2) => startDrag(e, ev2, ci)} faded={isFaded} />;
+                  return <EventBlock key={ev.id} ev={ev} top={timeToY(ev.start, HH)} height={h} onClick={onEv} onMouseDown={(e, ev2) => startDrag(e, ev2, ci)} onLongPress={onLongPress} faded={isFaded} />;
                 })}
                 {drag && drag.ci === ci && (
                   <DragGhost color={getProfile((drag.ev.pids || [])[0] || "jeremy").color} top={drag.ghostTop} height={drag.dur / 60 * HH} title={drag.ev.title} start={drag.ns} end={drag.ne} />
