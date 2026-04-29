@@ -182,10 +182,10 @@ Servings for: ${people} people.
 Reply ONLY with a valid JSON object. Keys are in the format "YYYY-MM-DD|MealType" where MealType is exactly "Breakfast", "Lunch", or "Dinner". Values are strings in the format "Meal Name|||Recipe" where the recipe is 3-5 sentences covering ingredients and preparation steps.
 Example key: "2026-04-26|Dinner"
 Example value: "Lemon Herb Chicken|||Ingredients: 2 chicken breasts, 1 lemon, garlic, olive oil, rosemary, salt, pepper. Season chicken with salt, pepper, and minced garlic. Heat olive oil in a skillet over medium-high heat. Sear chicken 6 minutes per side until golden. Finish with lemon juice and fresh rosemary."`;
-  try {
-    const raw = await callAI("Generate the meal plan now.", sys);
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (match) return JSON.parse(match[0]);
-  } catch { /* fall through */ }
-  return null;
+
+  // Let errors propagate so callers can show real messages to the user
+  const raw = await callAI("Generate the meal plan now.", sys);
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error("AI returned an unexpected response format. Please try again.");
+  return JSON.parse(match[0]);
 }

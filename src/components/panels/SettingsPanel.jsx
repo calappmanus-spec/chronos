@@ -58,7 +58,8 @@ export default function SettingsPanel({ darkMode, setDarkMode, sleepMode, setSle
   );
 
   return (
-    <div style={{ flex: 1, overflowY: "auto", padding: 20, ...FF }}>
+    <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px", ...FF }}>
+      <div style={{ maxWidth: 600, margin: "0 auto" }}>
       <div style={{ fontSize: 18, fontWeight: 700, color: onBg0, marginBottom: 4 }}>Settings</div>
       <div style={{ fontSize: 13, color: onBg2, marginBottom: 20 }}>Customize Chronos.</div>
 
@@ -339,6 +340,7 @@ export default function SettingsPanel({ darkMode, setDarkMode, sleepMode, setSle
           Multi-user · Shared calendars · Push notifications
         </div>
       </div>
+      </div>{/* end maxWidth wrapper */}
     </div>
   );
 }

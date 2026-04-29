@@ -62,19 +62,42 @@ function WeekGrid({ T, days, rowLabels, data, setData, accentColor }) {
   );
 }
 
-// ─── AI Generator modal ──────────────────────────────────────────────────────
-function GenModal({ T, title, children, onClose, onGenerate, loading, genMsg, genLabel }) {
+// ─── AI Generator modal — centered ───────────────────────────────────────────
+function GenModal({ T, title, children, onClose, onGenerate, loading, genMsg, genError, genLabel }) {
   return (
-    <div onClick={e => e.target === e.currentTarget && !loading && onClose()} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 900, backdropFilter: "blur(4px)" }}>
-      <div className="animate-slide-up" style={{ background: T.card, borderRadius: "20px 20px 0 0", padding: 24, width: "100%", maxWidth: 520, boxShadow: `0 -8px 40px rgba(0,0,0,0.3)`, paddingBottom: "calc(24px + env(safe-area-inset-bottom))", ...FF }}>
-        <div style={{ width: 36, height: 4, borderRadius: 2, background: T.b1, margin: "0 auto 18px" }} />
-        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 18, fontWeight: 700, color: T.t0, marginBottom: 4 }}><Bot size={20} /> {title}</div>
-        <div style={{ fontSize: 13, color: T.t2, marginBottom: 20 }}>Answer a few questions and AI will build your plan.</div>
+    <div onClick={e => e.target === e.currentTarget && !loading && onClose()}
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 900, backdropFilter: "blur(6px)", padding: "20px 16px" }}>
+      <div className="animate-scale-in" style={{ background: T.card, borderRadius: 20, padding: "28px 24px", width: "100%", maxWidth: 480, boxShadow: `0 24px 60px rgba(0,0,0,0.4)`, ...FF }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 18, fontWeight: 700, color: T.t0 }}>
+            <Bot size={20} color="#6366F1" /> {title}
+          </div>
+          {!loading && (
+            <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: T.t3, padding: 4 }}>✕</button>
+          )}
+        </div>
+        <div style={{ fontSize: 13, color: T.t2, marginBottom: 22 }}>Answer a few questions and AI will build your plan.</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>{children}</div>
-        {genMsg && <div style={{ fontSize: 12, color: loading ? T.t2 : "#4AA96C", textAlign: "center", marginTop: 14 }}>{genMsg}</div>}
+
+        {/* Status messages */}
+        {genMsg && !genError && (
+          <div style={{ fontSize: 12, color: loading ? T.t2 : "#4AA96C", textAlign: "center", marginTop: 14, fontWeight: 600 }}>
+            {loading ? "⏳ " : "✓ "}{genMsg}
+          </div>
+        )}
+        {genError && (
+          <div style={{ fontSize: 12, color: "#E05555", textAlign: "center", marginTop: 14, fontWeight: 600, background: "rgba(224,85,85,0.08)", borderRadius: 8, padding: "8px 12px" }}>
+            ⚠ {genError}
+          </div>
+        )}
+
         <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
-          <button onClick={() => { if (!loading) onClose(); }} style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: `1px solid ${T.b1}`, background: "transparent", color: T.t2, fontSize: 13, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", ...FF }}>Cancel</button>
-          <button onClick={onGenerate} disabled={loading} style={{ flex: 2, padding: "11px 0", borderRadius: 10, border: "none", background: loading ? "rgba(128,128,128,0.2)" : "linear-gradient(135deg,#6366F1,#9B5DE5)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, ...FF }}>
+          <button onClick={() => { if (!loading) onClose(); }}
+            style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: `1px solid ${T.b1}`, background: "transparent", color: T.t2, fontSize: 13, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", ...FF }}>
+            Cancel
+          </button>
+          <button onClick={onGenerate} disabled={loading}
+            style={{ flex: 2, padding: "11px 0", borderRadius: 10, border: "none", background: loading ? "rgba(128,128,128,0.2)" : "linear-gradient(135deg,#6366F1,#9B5DE5)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, ...FF }}>
             <Bot size={14} /> {loading ? "Generating…" : genLabel}
           </button>
         </div>
@@ -106,7 +129,7 @@ function ChipGroup({ options, value, onChange, T }) {
 }
 
 // ─── Main Panel ──────────────────────────────────────────────────────────────
-export default function MealsPanel({ T, calBg = "transparent", isBgDark = true, mealData = {}, setMealData, workoutData = {}, setWorkoutData, onAddEvents }) {
+export default function MealsPanel({ T, calBg = "transparent", isBgDark = true, mealData = {}, setMealData, workoutData = {}, setWorkoutData, onAddEvents, currentUser = "user" }) {
   const hasBg = calBg !== "transparent";
   const onBg0 = hasBg ? (isBgDark ? "#fff" : "#1a1a2e") : T.t0;
   const onBg2 = hasBg ? (isBgDark ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,0.45)") : T.t2;
@@ -120,6 +143,7 @@ export default function MealsPanel({ T, calBg = "transparent", isBgDark = true, 
   const [mealPrefs,    setMealPrefs]    = useState({ people: 2, restrictions: "", preferences: "", days: 7 });
   const [mealLoading,  setMealLoading]  = useState(false);
   const [mealMsg,      setMealMsg]      = useState("");
+  const [mealError,    setMealError]    = useState("");
   const [addToCal,     setAddToCal]     = useState(false);
 
   // Workout AI state
@@ -127,6 +151,7 @@ export default function MealsPanel({ T, calBg = "transparent", isBgDark = true, 
   const [workPrefs,    setWorkPrefs]    = useState({ level: "Intermediate", goal: "General Fitness", equipment: "Home Gym", duration: 45, daysPerWeek: 4, limitations: "" });
   const [workLoading,  setWorkLoading]  = useState(false);
   const [workMsg,      setWorkMsg]      = useState("");
+  const [workError,    setWorkError]    = useState("");
   const [addWorkToCal, setAddWorkToCal] = useState(false);
 
   // Optimize meals for workout
@@ -135,47 +160,72 @@ export default function MealsPanel({ T, calBg = "transparent", isBgDark = true, 
   const inp = { background: T.bg1, border: `1px solid ${T.b1}`, borderRadius: 8, padding: "8px 10px", color: T.t0, fontSize: 13, outline: "none", boxSizing: "border-box", width: "100%", ...FF };
 
   async function handleMealGenerate() {
-    setMealLoading(true); setMealMsg("");
-    const result = await generateMealPlan({ ...mealPrefs, startDate });
-    setMealLoading(false);
-    if (!result) { setMealMsg("AI couldn't generate a plan. Check your API key in Settings."); return; }
-    const newData = { ...mealData };
-    const calEvents = [];
-    Object.entries(result).forEach(([k, v]) => {
-      const parts = k.split("|"); if (parts.length < 2) return;
-      const [ds, mealType] = parts;
-      const [mealName, recipe] = (v || "").split("|||");
-      if (mealName) newData[`${ds}|${mealType}`] = mealName.trim();
-      if (addToCal && recipe && onAddEvents) calEvents.push({ id: Math.random().toString(36).slice(2), baseId: Math.random().toString(36).slice(2), title: mealName.trim(), date: ds, allDay: true, start: mealType === "Breakfast" ? "08:00" : mealType === "Lunch" ? "12:00" : "18:00", end: mealType === "Breakfast" ? "09:00" : mealType === "Lunch" ? "13:00" : "19:00", notes: recipe?.trim() || "", category: "health", pids: ["jeremy"], organizer: "jeremy", recurring: false, recurrence: { freq: "weekly", until: "" }, reminders: [], important: false, private: false, attendees: { jeremy: "accepted" } });
-    });
-    setMealData(newData);
-    if (calEvents.length > 0 && onAddEvents) onAddEvents(calEvents);
-    setMealMsg(`Meal plan generated! ${Object.keys(result).length} meals added.`);
-    setTimeout(() => { setShowMealGen(false); setMealMsg(""); }, 2500);
+    setMealLoading(true); setMealMsg(""); setMealError("");
+    try {
+      const result = await generateMealPlan({ ...mealPrefs, startDate });
+      const newData = { ...mealData };
+      const calEvents = [];
+      Object.entries(result).forEach(([k, v]) => {
+        const parts = k.split("|"); if (parts.length < 2) return;
+        const [ds, mealType] = parts;
+        const [mealName, recipe] = (v || "").split("|||");
+        if (mealName) newData[`${ds}|${mealType}`] = mealName.trim();
+        if (addToCal && recipe && onAddEvents) calEvents.push({
+          id: Math.random().toString(36).slice(2), baseId: Math.random().toString(36).slice(2),
+          title: mealName.trim(), date: ds, allDay: true,
+          start: mealType === "Breakfast" ? "08:00" : mealType === "Lunch" ? "12:00" : "18:00",
+          end:   mealType === "Breakfast" ? "09:00" : mealType === "Lunch" ? "13:00" : "19:00",
+          notes: recipe?.trim() || "", category: "health",
+          pids: [currentUser], organizer: currentUser, recurring: false,
+          recurrence: { freq: "weekly", until: "" }, reminders: [], important: false, private: false,
+          attendees: { [currentUser]: "accepted" },
+        });
+      });
+      setMealData(newData);
+      if (calEvents.length > 0 && onAddEvents) onAddEvents(calEvents);
+      setMealMsg(`✓ ${Object.keys(result).length} meals generated!`);
+      setTimeout(() => { setShowMealGen(false); setMealMsg(""); }, 2000);
+    } catch (err) {
+      setMealError(err.message || "Failed to generate meal plan. Check your API key in Settings.");
+    } finally {
+      setMealLoading(false);
+    }
   }
 
   async function handleWorkoutGenerate() {
-    setWorkLoading(true); setWorkMsg("");
-    const result = await generateWorkoutPlan({ ...workPrefs, startDate, days: 7 });
-    setWorkLoading(false);
-    if (!result) { setWorkMsg("AI couldn't generate a plan. Check your API key in Settings."); return; }
-    const newData = { ...workoutData };
-    const calEvents = [];
-    Object.entries(result).forEach(([k, v]) => {
-      const parts = k.split("|"); if (parts.length < 2) return;
-      const [ds, slot] = parts;
-      const [workoutName, instructions] = (v || "").split("|||");
-      if (workoutName) newData[`${ds}|${slot}`] = workoutName.trim();
-      if (addWorkToCal && onAddEvents) {
-        const startH = slot === "Morning" ? "06:30" : slot === "Afternoon" ? "12:00" : "18:00";
-        const endH   = slot === "Morning" ? "07:15" : slot === "Afternoon" ? "12:45" : "18:45";
-        calEvents.push({ id: Math.random().toString(36).slice(2), baseId: Math.random().toString(36).slice(2), title: workoutName.trim(), date: ds, allDay: false, start: startH, end: endH, notes: instructions?.trim() || "", category: "health", pids: ["jeremy"], organizer: "jeremy", recurring: false, recurrence: { freq: "weekly", until: "" }, reminders: [30], important: false, private: false, attendees: { jeremy: "accepted" } });
-      }
-    });
-    setWorkoutData(newData);
-    if (calEvents.length > 0 && onAddEvents) onAddEvents(calEvents);
-    setWorkMsg(`Workout plan generated!`);
-    setTimeout(() => { setShowWorkGen(false); setWorkMsg(""); }, 2500);
+    setWorkLoading(true); setWorkMsg(""); setWorkError("");
+    try {
+      const result = await generateWorkoutPlan({ ...workPrefs, startDate, days: 7 });
+      if (!result) throw new Error("AI returned an empty workout plan. Please try again.");
+      const newData = { ...workoutData };
+      const calEvents = [];
+      Object.entries(result).forEach(([k, v]) => {
+        const parts = k.split("|"); if (parts.length < 2) return;
+        const [ds, slot] = parts;
+        const [workoutName, instructions] = (v || "").split("|||");
+        if (workoutName) newData[`${ds}|${slot}`] = workoutName.trim();
+        if (addWorkToCal && onAddEvents) {
+          const startH = slot === "Morning" ? "06:30" : slot === "Afternoon" ? "12:00" : "18:00";
+          const endH   = slot === "Morning" ? "07:15" : slot === "Afternoon" ? "12:45" : "18:45";
+          calEvents.push({
+            id: Math.random().toString(36).slice(2), baseId: Math.random().toString(36).slice(2),
+            title: workoutName.trim(), date: ds, allDay: false, start: startH, end: endH,
+            notes: instructions?.trim() || "", category: "health",
+            pids: [currentUser], organizer: currentUser, recurring: false,
+            recurrence: { freq: "weekly", until: "" }, reminders: [30], important: false, private: false,
+            attendees: { [currentUser]: "accepted" },
+          });
+        }
+      });
+      setWorkoutData(newData);
+      if (calEvents.length > 0 && onAddEvents) onAddEvents(calEvents);
+      setWorkMsg("✓ Workout plan generated!");
+      setTimeout(() => { setShowWorkGen(false); setWorkMsg(""); }, 2000);
+    } catch (err) {
+      setWorkError(err.message || "Failed to generate workout plan. Check your API key in Settings.");
+    } finally {
+      setWorkLoading(false);
+    }
   }
 
   async function handleOptimizeMeals() {
@@ -229,7 +279,7 @@ export default function MealsPanel({ T, calBg = "transparent", isBgDark = true, 
 
       {/* ── Meal Generator Modal ── */}
       {showMealGen && (
-        <GenModal T={T} title="AI Meal Plan" onClose={() => setShowMealGen(false)} onGenerate={handleMealGenerate} loading={mealLoading} genMsg={mealMsg} genLabel="Generate Meal Plan">
+        <GenModal T={T} title="AI Meal Plan" onClose={() => { setShowMealGen(false); setMealError(""); }} onGenerate={handleMealGenerate} loading={mealLoading} genMsg={mealMsg} genError={mealError} genLabel="Generate Meal Plan">
           <OptionRow label="Servings for how many people?">
             <ChipGroup T={T} options={["1","2","3","4","5","6"]} value={String(mealPrefs.people)} onChange={v => setMealPrefs(p => ({ ...p, people: Number(v) }))} />
           </OptionRow>
@@ -254,7 +304,7 @@ export default function MealsPanel({ T, calBg = "transparent", isBgDark = true, 
 
       {/* ── Workout Generator Modal ── */}
       {showWorkGen && (
-        <GenModal T={T} title="AI Workout Plan" onClose={() => setShowWorkGen(false)} onGenerate={handleWorkoutGenerate} loading={workLoading} genMsg={workMsg} genLabel="Generate Workout Plan">
+        <GenModal T={T} title="AI Workout Plan" onClose={() => { setShowWorkGen(false); setWorkError(""); }} onGenerate={handleWorkoutGenerate} loading={workLoading} genMsg={workMsg} genError={workError} genLabel="Generate Workout Plan">
           <OptionRow label="Fitness level">
             <ChipGroup T={T} options={["Beginner","Intermediate","Advanced"]} value={workPrefs.level} onChange={v => setWorkPrefs(p => ({ ...p, level: v }))} />
           </OptionRow>

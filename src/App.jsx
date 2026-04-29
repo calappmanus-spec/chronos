@@ -697,7 +697,7 @@ export default function App() {
         {section === "calendar" && view === "day"   && <DayView   {...calViewProps} onSlot={openNew} onEv={openDetail} weatherCurrent={weatherCurrent} />}
         {section === "calendar" && view === "year"  && <YearView  {...calViewProps} onMonthClick={mi => { setDate(d => new Date(d.getFullYear(), mi, 1)); setView("month"); }} />}
 
-        {section === "meals"    && <MealsPanel T={T} calBg={calBg} isBgDark={isBgDark} mealData={mealData} setMealData={setMealData} workoutData={workoutData} setWorkoutData={setWorkoutData} onAddEvents={evs => setEvents(es => [...es, ...evs])} />}
+        {section === "meals"    && <MealsPanel T={T} calBg={calBg} isBgDark={isBgDark} mealData={mealData} setMealData={setMealData} workoutData={workoutData} setWorkoutData={setWorkoutData} onAddEvents={evs => setEvents(es => [...es, ...evs])} currentUser={currentUser} />}
         {section === "weather"  && <WeatherPanel T={T} calBg={calBg} isBgDark={isBgDark} location={weatherLocation} coords={weatherCoords} />}
         {section === "tasks"    && <TasksPanel tasks={tasks} setTasks={setTasks} lists={taskLists} setLists={setTaskLists} T={T} accent={accent} calBg={calBg} isBgDark={isBgDark} />}
         {section === "goals"    && <GoalsPanel goals={goals} setGoals={setGoals} T={T} accent={accent} calBg={calBg} isBgDark={isBgDark} onAddEvents={evs => setEvents(es => [...es, ...evs])} onAddTasks={tks => setTasks(ts => [...ts, ...tks])} setMealData={setMealData} setWorkoutData={setWorkoutData} />}
