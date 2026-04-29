@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { X, Trash2, Users, Share2, Lock } from "lucide-react";
-import { PROFILES, CAL_COLORS } from "../../constants.js";
-import { rgba, uid } from "../../utils.js";
+import { CAL_COLORS } from "../../constants.js";
+import { rgba, uid, getProfiles } from "../../utils.js";
 import { FF } from "../../theme.js";
 import Avatar from "../atoms/Avatar.jsx";
 
@@ -108,7 +108,7 @@ export default function CalendarGroupModal({ calendar, currentUser, onSave, onDe
               <Users size={11} /> Members ({members.length})
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {PROFILES.map(p => {
+              {getProfiles().map(p => {
                 const on  = members.includes(p.id);
                 const isMe = p.id === currentUser;
                 return (

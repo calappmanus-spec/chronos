@@ -20,7 +20,29 @@ export function minToTime(m)    { return `${pad(Math.floor(m / 60))}:${pad(m % 6
 export function timeToY(t, HH)  { const [h, m] = t.split(":").map(Number); return (h + m / 60) * HH; }
 
 // ─── Profile helpers ──────────────────────────────────────────────────────────
-export function getProfile(id) { return PROFILES.find(p => p.id === id) || PROFILES[0]; }
+// Returns all real user accounts from localStorage (created via AuthScreen).
+// Falls back to PROFILES (now empty) for backward compat.
+export function getProfiles() {
+  try {
+    const accs = JSON.parse(localStorage.getItem("ch_accounts") || "[]");
+    if (accs.length) return accs.map(a => ({ id: a.id, name: a.name, color: a.color || "#6366F1", family: false }));
+  } catch { /* ignore */ }
+  return PROFILES;
+}
+
+const _FALLBACK_PROFILE = { id: "user", name: "User", color: "#6366F1", family: false };
+
+export function getProfile(id) {
+  if (!id) return _FALLBACK_PROFILE;
+  // Check real auth accounts first
+  try {
+    const accs = JSON.parse(localStorage.getItem("ch_accounts") || "[]");
+    const found = accs.find(a => a.id === id);
+    if (found) return { id: found.id, name: found.name, color: found.color || "#6366F1", family: false };
+  } catch { /* ignore */ }
+  // Fall back to static PROFILES (now empty by default)
+  return PROFILES.find(p => p.id === id) || _FALLBACK_PROFILE;
+}
 
 // ─── Color helpers ────────────────────────────────────────────────────────────
 export function rgba(hex, op) {

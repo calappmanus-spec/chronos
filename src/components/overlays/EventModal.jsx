@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Trash2, X, Lock, MapPin, FileText, Copy, User, Briefcase, Users, Heart, Plane, BookOpen, Sparkles } from "lucide-react";
-import { PROFILES, FAM_IDS, CAL_COLORS } from "../../constants.js";
-import { TODAY, uid, rgba, getProfile, toMin, minToTime } from "../../utils.js";
+import { CAL_COLORS } from "../../constants.js";
+import { TODAY, uid, rgba, getProfile, getProfiles, toMin, minToTime } from "../../utils.js";
 import { findConflicts } from "../../data.js";
 import { FF } from "../../theme.js";
 import Toggle from "../atoms/Toggle.jsx";
@@ -94,7 +94,7 @@ export default function EventModal({ event, allEvents, currentUser, calendars = 
     form.pids.forEach(p => {
       att[p] = (event.attendees && p in event.attendees)
         ? event.attendees[p]
-        : (p === form.organizer || FAM_IDS.includes(p)) ? "accepted" : "pending";
+        : p === form.organizer ? "accepted" : "pending";
     });
     onSave({ ...form, id, baseId, attendees: att });
   }
@@ -103,7 +103,7 @@ export default function EventModal({ event, allEvents, currentUser, calendars = 
     if (!form.title.trim()) return;
     const newId = uid(), newBaseId = uid();
     const att = {};
-    form.pids.forEach(p => { att[p] = FAM_IDS.includes(p) ? "accepted" : "pending"; });
+    form.pids.forEach(p => { att[p] = p === form.organizer ? "accepted" : "pending"; });
     onSave({ ...form, id: newId, baseId: newBaseId, title: form.title + " (copy)", attendees: att });
   }
 
@@ -122,7 +122,7 @@ export default function EventModal({ event, allEvents, currentUser, calendars = 
     return getBestTimeSlots(allEvents, form.date, form.pids, dur);
   }, [showSlots, form.date, form.pids, form.allDay, form.start, form.end]);
 
-  const isFamilyEvent = form.pids.length > 1 && form.pids.every(p => FAM_IDS.includes(p));
+  const isFamilyEvent = false; // family grouping removed — all users are equal
   const locIsURL      = isURL(form.location);
   const locIsMeeting  = isMeetingURL(form.location);
   const currentDur    = toMin(form.end) - toMin(form.start);
@@ -400,11 +400,11 @@ export default function EventModal({ event, allEvents, currentUser, calendars = 
         <Section>
           <Label text="Participants" />
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: form.pids.length > 1 ? 8 : 0 }}>
-            {PROFILES.map(p => {
+            {getProfiles().map(p => {
               const on = form.pids.includes(p.id);
               return (
                 <button key={p.id} onClick={() => togglePid(p.id)} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 600, padding: "4px 11px", borderRadius: 20, border: `1px solid ${on ? p.color : T.b1}`, background: on ? rgba(p.color,0.1) : "transparent", color: on ? p.color : T.t2, cursor: "pointer", ...FF }}>
-                  {p.family ? "F" : "W"} {p.name}
+                  {p.name}
                 </button>
               );
             })}

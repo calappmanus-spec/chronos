@@ -1,12 +1,7 @@
-export const PROFILES = [
-  { id: "jeremy", name: "Jeremy", color: "#E05555", family: true  },
-  { id: "sarah",  name: "Sarah",  color: "#9B5DE5", family: true  },
-  { id: "emma",   name: "Emma",   color: "#0096C7", family: true  },
-  { id: "alex",   name: "Alex",   color: "#F4881A", family: false },
-  { id: "morgan", name: "Morgan", color: "#2A9D8F", family: false },
-  { id: "casey",  name: "Casey",  color: "#4AA96C", family: false },
-];
-export const FAM_IDS = PROFILES.filter(p => p.family).map(p => p.id);
+// Profiles are now dynamic — loaded from auth accounts (ch_accounts in localStorage).
+// Use getProfiles() / getProfile() from utils.js instead.
+export const PROFILES = [];
+export const FAM_IDS  = [];
 
 export const MONTHS   = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 export const MONTHS_S = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -79,10 +74,8 @@ export const CAL_COLORS = [
 ];
 
 function calUid() { return Math.random().toString(36).slice(2,8); }
-export const INIT_CALENDARS = [
-  { id: "cal_personal", name: "Personal", color: "#6366F1", members: ["jeremy"],              owner: "jeremy", isDefault: true, shared: false },
-  { id: "cal_family",   name: "Family",   color: "#E05555", members: ["jeremy","sarah","emma"], owner: "jeremy", isDefault: true, shared: true  },
-];
+// Calendars are created by users — no hardcoded defaults.
+export const INIT_CALENDARS = [];
 
 // ─── Calendar background presets ─────────────────────────────────────────
 export const CAL_BACKGROUNDS = [

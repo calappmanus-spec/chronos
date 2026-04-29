@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { PROFILES, BADGES_ALL, SHOP_ITEMS, getWeeklyChallenges } from "../../constants.js";
+import { BADGES_ALL, SHOP_ITEMS, getWeeklyChallenges } from "../../constants.js";
+import { getProfiles } from "../../utils.js";
 import { rgba, getLevel, getNextLevel } from "../../utils.js";
 import { FF } from "../../theme.js";
 import Avatar from "../atoms/Avatar.jsx";
@@ -34,12 +35,13 @@ export default function RewardsPanel({ rewards, T, currentUser, accent, activity
   const [badgeFilter, setBadgeFilter] = useState("All");
 
   const sorted = useMemo(() => {
-    return PROFILES
+    return getProfiles()
       .map(p => ({ ...p, ...(rewards[p.id] || { pts: 0, done: 0, streak: 0, famEvs: 0 }) }))
       .sort((a, b) => b.pts - a.pts);
   }, [rewards]);
 
-  const me        = sorted.find(p => p.id === currentUser) || sorted[0];
+  const _empty    = { id: currentUser, name: "You", color: "#6366F1", pts: 0, done: 0, streak: 0, famEvs: 0 };
+  const me        = sorted.find(p => p.id === currentUser) || sorted[0] || _empty;
   const lvl       = getLevel(me.pts);
   const nxt       = getNextLevel(me.pts);
   const pct       = nxt ? Math.min(100, Math.round(((me.pts - lvl.min) / (nxt.min - lvl.min)) * 100)) : 100;

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { X, Eye, EyeOff, Pencil, Plus, Share2, Lock, ChevronDown, Users } from "lucide-react";
-import { NAV_H, PROFILES } from "../../constants.js";
-import { rgba, getProfile } from "../../utils.js";
+import { NAV_H } from "../../constants.js";
+import { rgba, getProfile, getProfiles } from "../../utils.js";
 import { FF } from "../../theme.js";
 import Avatar from "../atoms/Avatar.jsx";
 
@@ -27,7 +27,7 @@ export default function CalendarPanel({
   );
 
   // All other profiles (not the current user)
-  const otherProfiles = PROFILES.filter(p => p.id !== currentUser);
+  const otherProfiles = getProfiles().filter(p => p.id !== currentUser);
 
   function togglePerson(pid) {
     setVisiblePeople(s => {

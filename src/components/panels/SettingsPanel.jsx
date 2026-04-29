@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { ChevronDown, MapPin, Download, Upload, Smartphone, KeyRound, Eye, EyeOff, Moon, Sunset, Zap, Bot, CalendarClock, Utensils, Sparkles, Users, Wind, MonitorOff, Cloud, RefreshCw, Calendar } from "lucide-react";
-import { FAM_IDS, CAL_BACKGROUNDS } from "../../constants.js";
+import { CAL_BACKGROUNDS } from "../../constants.js";
 import { rgba, getProfile } from "../../utils.js";
 import { FF } from "../../theme.js";
 import Toggle from "../atoms/Toggle.jsx";
@@ -336,7 +336,7 @@ export default function SettingsPanel({ darkMode, setDarkMode, sleepMode, setSle
         <div style={{ fontSize: 11, color: T.t2, marginTop: 2, ...FF }}>v2.0 · AI-Powered · Family & Team</div>
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: T.t3, marginTop: 8, ...FF }}>
           <Users size={12} color={T.t3} />
-          Family: {FAM_IDS.map(id => getProfile(id).name).join(", ")}
+          Multi-user · Shared calendars · Push notifications
         </div>
       </div>
     </div>

@@ -104,7 +104,12 @@ export default function App() {
     // Prefer the session userId so the logged-in account drives everything
     const sess = getSession();
     if (sess?.userId) return sess.userId;
-    return ls("ch_user", "jeremy");
+    // Fall back to first account in localStorage, or a generic id
+    try {
+      const accs = JSON.parse(localStorage.getItem("ch_accounts") || "[]");
+      if (accs.length) return accs[0].id;
+    } catch { /* ignore */ }
+    return ls("ch_user", "user");
   });
   const [section,       setSection]       = useState("calendar");
   const [hidden,        setHidden]        = useState(new Set());
@@ -569,7 +574,7 @@ export default function App() {
   function handleLogout() {
     clearSession();
     setSession(null);
-    setCurrentUser("jeremy"); // reset to default
+    setCurrentUser("user"); // reset to generic default
   }
 
   // Special full-screen modes
