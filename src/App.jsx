@@ -231,11 +231,6 @@ export default function App() {
     taskLists.forEach(l => sync.save("task_lists", l));
   }, [taskLists]); // eslint-disable-line
 
-  // ── Push notification scheduling (reschedule when events change) ──
-  useEffect(() => {
-    scheduleAllReminders(myEvents, currentUser);
-  }, [myEvents, currentUser]); // eslint-disable-line
-
   // ── Google OAuth callback handler ──
   useEffect(() => {
     const url  = new URL(window.location.href);
@@ -309,6 +304,12 @@ export default function App() {
   }, []);
 
   const myEvents = useMemo(() => (events || []).filter(e => (e.pids || []).includes(currentUser)), [events, currentUser]);
+
+  // ── Push notification scheduling (reschedule when events change) ──
+  useEffect(() => {
+    scheduleAllReminders(myEvents, currentUser);
+  }, [myEvents, currentUser]); // eslint-disable-line
+
   const visibleEvents = useMemo(() => {
     return (events || []).filter(e => {
       const isParticipant = (e.pids || []).includes(currentUser);
