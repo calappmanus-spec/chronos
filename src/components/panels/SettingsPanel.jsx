@@ -13,6 +13,9 @@ export default function SettingsPanel({ darkMode, setDarkMode, sleepMode, setSle
   const onBg0 = hasBg ? (isBgDark ? "#fff" : "#1a1a2e") : T.t0;
   const onBg2 = hasBg ? (isBgDark ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,0.45)") : T.t2;
 
+  // Detect if app is already installed as PWA (standalone mode)
+  const isInstalled = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+
   const [customHex,  setCustomHex]  = useState("");
   const [bgOpen,     setBgOpen]     = useState(false);
   const [locDraft,   setLocDraft]   = useState(weatherLocation);
@@ -239,15 +242,46 @@ export default function SettingsPanel({ darkMode, setDarkMode, sleepMode, setSle
       )}
 
       {/* ── PWA Install ── */}
-      {pwaPrompt && (
-        <div style={{ background: T.card, border: `1px solid ${T.b1}`, borderRadius: 16, padding: "14px 16px", marginBottom: 14 }}>
-          <SectionLabel text="Install App" />
-          <button onClick={async () => { pwaPrompt.prompt(); const { outcome } = await pwaPrompt.userChoice; if (outcome === "accepted") setPwaPrompt?.(null); }} className="btn-press"
-            style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", justifyContent: "center", padding: "10px 0", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#6366F1,#9B5DE5)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", ...FF }}>
-            <Smartphone size={15} /> Add Chronos to Home Screen
-          </button>
+      <div style={{ background: T.card, border: `1px solid ${T.b1}`, borderRadius: 16, padding: "14px 16px", marginBottom: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+          <Smartphone size={14} color="#6366F1" />
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".5px", textTransform: "uppercase", color: T.t3, ...FF }}>Install App</div>
+          {isInstalled && <div style={{ marginLeft: "auto", fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: "rgba(74,169,108,0.12)", color: "#4AA96C", ...FF }}>Installed ✓</div>}
         </div>
-      )}
+
+        {isInstalled ? (
+          <div style={{ fontSize: 12, color: T.t2, lineHeight: 1.5, ...FF }}>
+            Chronos is running as an installed app — enjoy the full offline experience!
+          </div>
+        ) : pwaPrompt ? (
+          <>
+            <button
+              onClick={async () => { pwaPrompt.prompt(); const { outcome } = await pwaPrompt.userChoice; if (outcome === "accepted") setPwaPrompt?.(null); }}
+              className="btn-press"
+              style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", justifyContent: "center", padding: "11px 0", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#6366F1,#9B5DE5)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", ...FF }}>
+              <Smartphone size={15} /> Add Chronos to Home Screen
+            </button>
+            <div style={{ fontSize: 11, color: T.t3, marginTop: 8, textAlign: "center", ...FF }}>Chrome/Edge will prompt you to install</div>
+          </>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ fontSize: 12, color: T.t1, marginBottom: 2, ...FF }}>Install for an app-like experience with offline support:</div>
+            {[
+              { icon: "📱", title: "iPhone / iPad", desc: "Safari → Share button → Add to Home Screen" },
+              { icon: "💻", title: "Mac (Safari)", desc: "File menu → Add to Dock" },
+              { icon: "🌐", title: "Chrome / Edge", desc: "Look for the install icon ⊕ in the address bar, or ⋮ → Install Chronos" },
+            ].map(({ icon, title, desc }) => (
+              <div key={title} style={{ display: "flex", gap: 10, padding: "10px 12px", background: T.bg1, border: `1px solid ${T.b1}`, borderRadius: 10, alignItems: "flex-start" }}>
+                <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{icon}</span>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: T.t0, marginBottom: 2, ...FF }}>{title}</div>
+                  <div style={{ fontSize: 11, color: T.t2, ...FF }}>{desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* ── AI Provider & Features ── */}
       <div style={{ background: T.card, border: `1px solid ${T.b1}`, borderRadius: 16, padding: "14px 16px", marginBottom: 14 }}>
